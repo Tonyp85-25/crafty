@@ -21,6 +21,8 @@ export interface DateProvider {
 
 export class MessageTooLongError extends Error {}
 
+export class EmptyMessageError extends Error {}
+
 export class PostMessageUseCase {
   constructor(
     private readonly messageRepository: MessageRepository,
@@ -29,6 +31,9 @@ export class PostMessageUseCase {
   handle(postMessageCommand: PostMessageCommand) {
     if (postMessageCommand.text.length > 280) {
       throw new MessageTooLongError();
+    }
+    if (postMessageCommand.text.trim().length === 0) {
+      throw new EmptyMessageError();
     }
     this.messageRepository.save({
       id: postMessageCommand.id,
