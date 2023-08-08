@@ -3,7 +3,6 @@ import {
   DateProvider,
   EmptyMessageError,
   Message,
-  MessageRepository,
   MessageTooLongError,
   PostMessageCommand,
   PostMessageUseCase,
