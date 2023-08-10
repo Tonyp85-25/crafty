@@ -7,7 +7,7 @@ import {
   PostMessageUseCase,
 } from "./src/post-message.usecase";
 import { InMemoryMessageRepository } from "./src/message-repository.inmemory";
-import { log } from "console";
+import { FileSystemMessageRepository } from "./src/message-repository.fs";
 
 class RealDateProvider implements DateProvider {
   getNow(): Date {
@@ -15,7 +15,7 @@ class RealDateProvider implements DateProvider {
   }
 }
 
-const messageRepository = new InMemoryMessageRepository();
+const messageRepository = new FileSystemMessageRepository();
 const dateProvider = new RealDateProvider();
 const postMessageUseCase = new PostMessageUseCase(
   messageRepository,
@@ -40,7 +40,7 @@ program
         try {
           await postMessageUseCase.handle(postMessageCommand);
           console.log("✔️  message posté!");
-          console.table([messageRepository.message]);
+          // console.table([messageRepository.message]);
         } catch (error) {
           console.error("⚠️ ", error);
         }
