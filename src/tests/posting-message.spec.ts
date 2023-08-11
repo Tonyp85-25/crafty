@@ -1,8 +1,8 @@
+import { Message } from "../message";
 import { InMemoryMessageRepository } from "../message-repository.inmemory";
 import {
   DateProvider,
   EmptyMessageError,
-  Message,
   MessageTooLongError,
   PostMessageCommand,
   PostMessageUseCase,
@@ -66,7 +66,7 @@ describe("Feature: posting a message", () => {
 });
 
 class StubDateProvider implements DateProvider {
-  now: Date;
+  now!: Date;
   getNow(): Date {
     return this.now;
   }
@@ -88,12 +88,14 @@ const createFixture = () => {
     async whenUserPostsAMessage(postMessageCommand: PostMessageCommand) {
       try {
         await postMessageUseCase.handle(postMessageCommand);
-      } catch (err) {
+      } catch (err: any) {
         thrownError = err;
       }
     },
     thenPostedMessageShouldBe(expectedMessage: Message) {
-      expect(expectedMessage).toEqual(messageRepository.message);
+      expect(expectedMessage).toEqual(
+        messageRepository.getMessageById(expectedMessage.id)
+      );
     },
     thenErrorShouldBe(expectedErrorClass: new () => Error) {
       expect(thrownError).toBeInstanceOf(expectedErrorClass);
