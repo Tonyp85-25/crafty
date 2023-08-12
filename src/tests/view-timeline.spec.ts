@@ -60,44 +60,6 @@ describe("Feature: view timeline", () => {
       ]);
     });
   });
-  // tests will be deleted after usage
-  // describe("publicationTime", () => {
-  //   it("should return 'less than minute ago' when the publication date is inferior to 1 minute", () => {
-  //     const now = new Date("2023-02-16T10:57:00.000Z");
-  //     const publishedAt = new Date("2023-02-16T10:56:30.000Z");
-
-  //     const text = publicationTime(now, publishedAt);
-  //     expect(text).toEqual("less than a minute ago");
-  //   });
-  //   it("should return '1 minute ago' when the publication date is equal to 1 minute", () => {
-  //     const now = new Date("2023-02-16T10:57:00.000Z");
-  //     const publishedAt = new Date("2023-02-16T10:56:00.000Z");
-
-  //     const text = publicationTime(now, publishedAt);
-  //     expect(text).toEqual("1 minute ago");
-  //   });
-  //   it("should return '1 minute ago' when the publication date is exactly under 2 minutes ago", () => {
-  //     const now = new Date("2023-02-16T10:57:00.000Z");
-  //     const publishedAt = new Date("2023-02-16T10:55:45.000Z");
-
-  //     const text = publicationTime(now, publishedAt);
-  //     expect(text).toEqual("1 minute ago");
-  //   });
-  //   it("should return '2 minutes ago' when the publication date is equal to 2 minutes ago", () => {
-  //     const now = new Date("2023-02-16T10:57:00.000Z");
-  //     const publishedAt = new Date("2023-02-16T10:55:00.000Z");
-
-  //     const text = publicationTime(now, publishedAt);
-  //     expect(text).toEqual("2 minutes ago");
-  //   });
-  //   it("should return 'X minute ago' when the publication date superior to 2 minutes ago", () => {
-  //     const now = new Date("2023-02-16T10:57:00.000Z");
-  //     const publishedAt = new Date("2023-02-16T10:54:00.000Z");
-
-  //     const text = publicationTime(now, publishedAt);
-  //     expect(text).toEqual("3 minutes ago");
-  //   });
-  // });
 });
 
 const createFixture = () => {

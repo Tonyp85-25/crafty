@@ -14,28 +14,17 @@ export class ViewTimelineUseCase {
       (msgA, msgB) => msgB.publishedAt.getTime() - msgA.publishedAt.getTime()
     );
     const now = this.dateProvider.getNow();
-    return [
-      {
-        author: userMessages[0].author,
-        text: userMessages[0].text,
-        publicationTime: this.publicationTime(now, userMessages[0].publishedAt),
-      },
-      {
-        author: userMessages[1].author,
-        text: userMessages[1].text,
-        publicationTime: this.publicationTime(now, userMessages[1].publishedAt),
-      },
-      {
-        author: userMessages[2].author,
-        text: userMessages[2].text,
-        publicationTime: this.publicationTime(now, userMessages[2].publishedAt),
-      },
-    ];
+    return userMessages.map((m) => ({
+      id: m.id,
+      author: m.author,
+      text: m.text,
+      publicationTime: this.publicationTime(now, m.publishedAt),
+    }));
   }
 
   private publicationTime = (now: Date, publishedAt: Date): string => {
     const diff = now.getTime() - publishedAt.getTime();
-    const minuteNumber = diff / 60000;
+    const minuteNumber = Math.floor(diff / 60000);
     if (minuteNumber < 1) {
       return "Less than a minute ago";
     }

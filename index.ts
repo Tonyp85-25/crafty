@@ -2,12 +2,14 @@
 
 import { Command } from "commander";
 import {
-  DateProvider,
   PostMessageCommand,
   PostMessageUseCase,
 } from "./src/post-message.usecase";
 import { InMemoryMessageRepository } from "./src/message-repository.inmemory";
 import { FileSystemMessageRepository } from "./src/message-repository.fs";
+import { DateProvider } from "./src/date-provider";
+import { randomUUID } from "crypto";
+import { ViewTimelineUseCase } from "./src/view-timeline.usecase";
 
 class RealDateProvider implements DateProvider {
   getNow(): Date {
@@ -18,6 +20,10 @@ class RealDateProvider implements DateProvider {
 const messageRepository = new FileSystemMessageRepository();
 const dateProvider = new RealDateProvider();
 const postMessageUseCase = new PostMessageUseCase(
+  messageRepository,
+  dateProvider
+);
+const viewTimelineUseCase = new ViewTimelineUseCase(
   messageRepository,
   dateProvider
 );
@@ -32,7 +38,7 @@ program
       .argument("<message>", "the message to post")
       .action(async (user, message) => {
         const postMessageCommand: PostMessageCommand = {
-          id: "some-message-id",
+          id: randomUUID(),
           author: user,
           text: message,
         };
@@ -43,6 +49,20 @@ program
           // console.table([messageRepository.message]);
         } catch (error) {
           console.error("⚠️ ", error);
+        }
+      })
+  )
+  .addCommand(
+    new Command("view")
+      .argument("<user>", "the user to view the timeline")
+      .action(async (user) => {
+        try {
+          const timeline = await viewTimelineUseCase.handle({ user });
+          console.table(timeline);
+          process.exit(0);
+        } catch (err) {
+          console.error(err);
+          process.exit(1);
         }
       })
   );
