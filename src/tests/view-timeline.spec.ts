@@ -3,12 +3,13 @@ import { ViewTimelineUseCase } from "../view-timeline.usecase";
 import { InMemoryMessageRepository } from "../message-repository.inmemory";
 import { Timeline } from "../timeline";
 import { StubDateProvider } from "../stub-date-provider";
+import { MessagingFixture, createMessagingFixture } from "./messaging.fixture";
 
 describe("Feature: view timeline", () => {
-  let fixture: Fixture;
+  let fixture: MessagingFixture;
 
   beforeEach(() => {
-    fixture = createFixture();
+    fixture = createMessagingFixture();
   });
   describe("Rule: Messages are shown in reverse chronological order", () => {
     test("Alice can view the 3 messages she published in her timeline", async () => {
@@ -61,29 +62,3 @@ describe("Feature: view timeline", () => {
     });
   });
 });
-
-const createFixture = () => {
-  let timeline: Timeline;
-  const messageRepository = new InMemoryMessageRepository();
-  const dateProvider = new StubDateProvider();
-  const viewTimelineUseCase = new ViewTimelineUseCase(
-    messageRepository,
-    dateProvider
-  );
-  return {
-    givenTheFollowingMessagesExist(messages: Message[]) {
-      messageRepository.givenExistingMessages(messages);
-    },
-    givenNowIs(now: Date) {
-      dateProvider.now = now;
-    },
-    async whenUserSeesTimelineOf(user: string) {
-      timeline = await viewTimelineUseCase.handle({ user });
-    },
-    thenUserShouldSee(_timeline: Timeline) {
-      expect(timeline).toEqual(_timeline);
-    },
-  };
-};
-
-type Fixture = ReturnType<typeof createFixture>;

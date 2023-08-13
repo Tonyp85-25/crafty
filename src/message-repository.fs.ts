@@ -2,14 +2,12 @@ import * as path from "path";
 import * as fs from "fs";
 import { Message } from "./message";
 import { MessageRepository } from "./message.repository";
-import { log } from "console";
 
 export class FileSystemMessageRepository implements MessageRepository {
   private readonly messagePath = path.join(__dirname, "message.json");
 
   async getAllOfUser(user: string): Promise<Message[]> {
     const messages = await this.getMessages();
-    log(messages);
     return messages.filter((m) => m.author === user);
   }
   async save(message: Message): Promise<void> {

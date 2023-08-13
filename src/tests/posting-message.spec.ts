@@ -7,12 +7,13 @@ import {
   PostMessageUseCase,
 } from "../post-message.usecase";
 import { StubDateProvider } from "../stub-date-provider";
+import { MessagingFixture, createMessagingFixture } from "./messaging.fixture";
 
 describe("Feature: posting a message", () => {
-  let fixture: Fixture;
+  let fixture: MessagingFixture;
 
   beforeEach(() => {
-    fixture = createFixture();
+    fixture = createMessagingFixture();
   });
 
   describe("Rule: a message can contain a maximum of 280 characters", () => {
@@ -23,7 +24,7 @@ describe("Feature: posting a message", () => {
         text: "Hello World",
         author: "Alice",
       });
-      fixture.thenPostedMessageShouldBe({
+      fixture.thenMessageShouldBe({
         id: "message-id",
         text: "Hello World",
         author: "Alice",
@@ -64,36 +65,3 @@ describe("Feature: posting a message", () => {
     });
   });
 });
-
-const createFixture = () => {
-  const dateProvider = new StubDateProvider();
-  const messageRepository = new InMemoryMessageRepository();
-  const postMessageUseCase = new PostMessageUseCase(
-    messageRepository,
-    dateProvider
-  );
-  let thrownError: Error;
-
-  return {
-    givenNowIs(_now: Date) {
-      dateProvider.now = _now;
-    },
-    async whenUserPostsAMessage(postMessageCommand: PostMessageCommand) {
-      try {
-        await postMessageUseCase.handle(postMessageCommand);
-      } catch (err: any) {
-        thrownError = err;
-      }
-    },
-    thenPostedMessageShouldBe(expectedMessage: Message) {
-      expect(expectedMessage).toEqual(
-        messageRepository.getMessageById(expectedMessage.id)
-      );
-    },
-    thenErrorShouldBe(expectedErrorClass: new () => Error) {
-      expect(thrownError).toBeInstanceOf(expectedErrorClass);
-    },
-  };
-};
-
-type Fixture = ReturnType<typeof createFixture>;
