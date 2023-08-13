@@ -2,6 +2,8 @@ import { DateProvider } from "./date-provider";
 import { MessageRepository } from "./message.repository";
 import { Timeline } from "./timeline";
 
+const ONE_MINUTE_IN_MS = 60000;
+
 export class ViewTimelineUseCase {
   constructor(
     private readonly messageRepository: MessageRepository,
@@ -15,7 +17,6 @@ export class ViewTimelineUseCase {
     );
     const now = this.dateProvider.getNow();
     return userMessages.map((m) => ({
-      id: m.id,
       author: m.author,
       text: m.text,
       publicationTime: this.publicationTime(now, m.publishedAt),
@@ -24,7 +25,7 @@ export class ViewTimelineUseCase {
 
   private publicationTime = (now: Date, publishedAt: Date): string => {
     const diff = now.getTime() - publishedAt.getTime();
-    const minuteNumber = Math.floor(diff / 60000);
+    const minuteNumber = Math.floor(diff / ONE_MINUTE_IN_MS);
     if (minuteNumber < 1) {
       return "Less than a minute ago";
     }
