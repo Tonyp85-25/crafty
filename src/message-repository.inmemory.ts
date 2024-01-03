@@ -2,6 +2,9 @@ import { MessageRepository } from "./message.repository";
 import { Message } from "./message";
 
 export class InMemoryMessageRepository implements MessageRepository {
+  getById(messageId: string): Promise<Message> {
+    return Promise.resolve(this.getMessageById(messageId));
+  }
   messages = new Map<string, Message>();
   save(msg: Message): Promise<void> {
     this._save(msg);
@@ -9,7 +12,7 @@ export class InMemoryMessageRepository implements MessageRepository {
   }
 
   getMessageById(messageId: string) {
-    return this.messages.get(messageId);
+    return this.messages.get(messageId)!;
   }
 
   givenExistingMessages(messages: Message[]) {

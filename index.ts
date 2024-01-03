@@ -1,14 +1,17 @@
 #!/usr/bin/env node
 
 import { Command } from "commander";
+import { randomUUID } from "crypto";
+import { DateProvider } from "./src/date-provider";
+import {
+  EditMessageCommand,
+  EditMessageUseCase,
+} from "./src/edit-message.usecase";
+import { FileSystemMessageRepository } from "./src/message-repository.fs";
 import {
   PostMessageCommand,
   PostMessageUseCase,
 } from "./src/post-message.usecase";
-import { InMemoryMessageRepository } from "./src/message-repository.inmemory";
-import { FileSystemMessageRepository } from "./src/message-repository.fs";
-import { DateProvider } from "./src/date-provider";
-import { randomUUID } from "crypto";
 import { ViewTimelineUseCase } from "./src/view-timeline.usecase";
 
 class RealDateProvider implements DateProvider {
@@ -27,6 +30,7 @@ const viewTimelineUseCase = new ViewTimelineUseCase(
   messageRepository,
   dateProvider
 );
+const editMessageUseCase = new EditMessageUseCase(messageRepository);
 const program = new Command();
 
 program
@@ -63,6 +67,25 @@ program
         } catch (err) {
           console.error(err);
           process.exit(1);
+        }
+      })
+  )
+  .addCommand(
+    new Command("edit")
+      .argument("<message-id>", "the id of the message to be updated")
+      .argument("<message>", "the text of the message")
+      .action(async (messageId, message) => {
+        const editMessageCommand: EditMessageCommand = {
+          messageId,
+          text: message,
+        };
+
+        try {
+          await editMessageUseCase.handle(editMessageCommand);
+          console.log("✔️  message modifié!");
+          // console.table([messageRepository.message]);
+        } catch (error) {
+          console.error("⚠️ ", error);
         }
       })
   );

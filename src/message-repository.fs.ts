@@ -1,5 +1,5 @@
-import * as path from "path";
 import * as fs from "fs";
+import * as path from "path";
 import { Message } from "./message";
 import { MessageRepository } from "./message.repository";
 
@@ -12,8 +12,19 @@ export class FileSystemMessageRepository implements MessageRepository {
   }
   async save(message: Message): Promise<void> {
     const messages = await this.getMessages();
-    messages.push(message);
+    const existingMessageIndex = messages.findIndex((m) => m.id === message.id);
+    if (existingMessageIndex === -1) {
+      messages.push(message);
+    } else {
+      messages[existingMessageIndex] = message;
+    }
+
     return fs.promises.writeFile(this.messagePath, JSON.stringify(messages));
+  }
+
+  async getById(messageId: string): Promise<Message> {
+    const messages = await this.getMessages();
+    return messages.find((m) => m.id === messageId)!;
   }
 
   private async getMessages(): Promise<Message[]> {

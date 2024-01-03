@@ -1,3 +1,4 @@
+import { EditMessageUseCase } from "../edit-message.usecase";
 import { Message } from "../message";
 import { InMemoryMessageRepository } from "../message-repository.inmemory";
 import {
@@ -15,6 +16,7 @@ export const createMessagingFixture = () => {
     messageRepository,
     dateProvider
   );
+  const editMessageUseCase= new EditMessageUseCase(messageRepository)
   const viewTimelineUseCase = new ViewTimelineUseCase(
     messageRepository,
     dateProvider
@@ -39,7 +41,13 @@ export const createMessagingFixture = () => {
     async whenUserEditsMessage(editMessageCommand: {
       messageId: string;
       text: string;
-    }) {},
+    }) {
+      try {
+        await editMessageUseCase.handle(editMessageCommand);
+      } catch (err: any) {
+        thrownError = err;
+      }
+    },
     thenMessageShouldBe(expectedMessage: Message) {
       expect(expectedMessage).toEqual(
         messageRepository.getMessageById(expectedMessage.id)
