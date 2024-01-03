@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
-import { Message } from "./message";
+import { Message, MessageText } from "./message";
 import { MessageRepository } from "./message.repository";
 
 export class FileSystemMessageRepository implements MessageRepository {
@@ -32,7 +32,7 @@ export class FileSystemMessageRepository implements MessageRepository {
     const messages = JSON.parse(data.toString()) as {
       id: string;
       author: string;
-      text: string;
+      text: MessageText;
       publishedAt: string;
     }[];
 

@@ -16,7 +16,7 @@ export const createMessagingFixture = () => {
     messageRepository,
     dateProvider
   );
-  const editMessageUseCase= new EditMessageUseCase(messageRepository)
+  const editMessageUseCase = new EditMessageUseCase(messageRepository);
   const viewTimelineUseCase = new ViewTimelineUseCase(
     messageRepository,
     dateProvider
@@ -48,10 +48,9 @@ export const createMessagingFixture = () => {
         thrownError = err;
       }
     },
-    thenMessageShouldBe(expectedMessage: Message) {
-      expect(expectedMessage).toEqual(
-        messageRepository.getMessageById(expectedMessage.id)
-      );
+    async thenMessageShouldBe(expectedMessage: Message) {
+      const message = await messageRepository.getById(expectedMessage.id);
+      expect(message).toEqual(expectedMessage);
     },
     thenErrorShouldBe(expectedErrorClass: new () => Error) {
       expect(thrownError).toBeInstanceOf(expectedErrorClass);

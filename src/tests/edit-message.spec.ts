@@ -14,13 +14,14 @@ describe("Feature: editing a message", () => {
       const aliceMessageBuilder = messageBuilder()
         .withId("message-1")
         .authoredBy("Alice")
-        .withText("Hello World");
+        .withText("Hello Wrld");
       fixture.givenTheFollowingMessagesExist([aliceMessageBuilder.build()]);
-      fixture.whenUserEditsMessage({
+      await fixture.whenUserEditsMessage({
         messageId: "message-1",
         text: "Hello World, how are you?",
       });
-      fixture.thenMessageShouldBe(
+
+      await fixture.thenMessageShouldBe(
         aliceMessageBuilder.withText("Hello World, how are you?").build()
       );
     });
@@ -43,14 +44,14 @@ describe("Feature: editing a message", () => {
     });
   });
   describe("Rule: a message cannot be empty", () => {
-    test("Alice can edit her message to a text with only whitespaces", async () => {
+    test("Alice cannot edit her message to a text with only whitespaces", async () => {
       const aliceMessageBuilder = messageBuilder()
-        .withId("message-1")
+        .withId("message-id")
         .authoredBy("Alice")
         .withText("Hello World");
       fixture.givenTheFollowingMessagesExist([aliceMessageBuilder.build()]);
-      fixture.whenUserEditsMessage({
-        messageId: "message-1",
+      await fixture.whenUserEditsMessage({
+        messageId: "message-id",
         text: "   ",
       });
       fixture.thenErrorShouldBe(EmptyMessageError);
