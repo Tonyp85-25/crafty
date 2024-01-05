@@ -2,17 +2,17 @@
 
 import { Command } from "commander";
 import { randomUUID } from "crypto";
-import { DateProvider } from "./src/date-provider";
+import { DateProvider } from "./src/application/date-provider";
 import {
   EditMessageCommand,
   EditMessageUseCase,
-} from "./src/edit-message.usecase";
-import { FileSystemMessageRepository } from "./src/message-repository.fs";
+} from "./src/application/usecases/edit-message.usecase";
 import {
   PostMessageCommand,
   PostMessageUseCase,
-} from "./src/post-message.usecase";
-import { ViewTimelineUseCase } from "./src/view-timeline.usecase";
+} from "./src/application/usecases/post-message.usecase";
+import { ViewTimelineUseCase } from "./src/application/usecases/view-timeline.usecase";
+import { FileSystemMessageRepository } from "./src/infra/message-repository.fs";
 
 class RealDateProvider implements DateProvider {
   getNow(): Date {
@@ -50,7 +50,6 @@ program
         try {
           await postMessageUseCase.handle(postMessageCommand);
           console.log("✔️  message posté!");
-          // console.table([messageRepository.message]);
         } catch (error) {
           console.error("⚠️ ", error);
         }

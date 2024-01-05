@@ -1,6 +1,6 @@
-import { DateProvider } from "./date-provider";
-import { MessageRepository } from "./message.repository";
-import { Timeline } from "./timeline";
+import { Timeline } from "../../domain/timeline";
+import { DateProvider } from "../date-provider";
+import { MessageRepository } from "../message.repository";
 
 const ONE_MINUTE_IN_MS = 60000;
 

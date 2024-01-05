@@ -1,4 +1,4 @@
-import { EmptyMessageError, MessageTooLongError } from "../message";
+import { EmptyMessageError, MessageTooLongError } from "../domain/message";
 import { messageBuilder } from "./message.builder";
 import { MessagingFixture, createMessagingFixture } from "./messaging.fixture";
 
@@ -19,12 +19,13 @@ describe("Feature: posting a message", () => {
       });
       fixture.thenMessageShouldBe(
         messageBuilder()
-      .withText("Hello World")
-      .withId("message-id")
-      .authoredBy("Alice")
-      .build());
-      });
-    
+          .withText("Hello World")
+          .withId("message-id")
+          .authoredBy("Alice")
+          .build()
+      );
+    });
+
     test("Too long message generates error", async () => {
       let textOf281 =
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer a ante quis enim iaculis scelerisque. Nulla interdum mauris id justo hendrerit, vitae vulputate justo sagittis. Integer posuere lacus finibus, aliquet diam sed, placerat sem. Curabitur gravida luctus tortor, ac nunc.";
