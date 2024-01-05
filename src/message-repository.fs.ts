@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
-import { Message, MessageText } from "./message";
+import { Message } from "./message";
 import { MessageRepository } from "./message.repository";
 
 export class FileSystemMessageRepository implements MessageRepository {
@@ -27,7 +27,7 @@ export class FileSystemMessageRepository implements MessageRepository {
         messages.map((m) => ({
           id: m.id,
           author: m.author,
-          text: m.text.value,
+          text: m.text,
           publishedAt: m.publishedAt,
         }))
       )
@@ -48,11 +48,13 @@ export class FileSystemMessageRepository implements MessageRepository {
       publishedAt: string;
     }[];
 
-    return messages.map((m) => ({
-      id: m.id,
-      author: m.author,
-      text: MessageText.of(m.text),
-      publishedAt: new Date(m.publishedAt),
-    }));
+    return messages.map((m) =>
+      Message.fromData({
+        id: m.id,
+        author: m.author,
+        text: m.text,
+        publishedAt: new Date(m.publishedAt),
+      })
+    );
   }
 }

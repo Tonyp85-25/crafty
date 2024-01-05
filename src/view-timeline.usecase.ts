@@ -18,7 +18,7 @@ export class ViewTimelineUseCase {
     const now = this.dateProvider.getNow();
     return userMessages.map((m) => ({
       author: m.author,
-      text: m.text.value,
+      text: m.text,
       publicationTime: this.publicationTime(now, m.publishedAt),
     }));
   }
