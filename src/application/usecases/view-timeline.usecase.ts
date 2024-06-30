@@ -1,8 +1,6 @@
-import { Timeline } from "../../domain/timeline";
-import { DateProvider } from "../date-provider";
-import { MessageRepository } from "../message.repository";
-
-const ONE_MINUTE_IN_MS = 60000;
+import { Timeline, type TimelineItem } from "../../domain/timeline";
+import type { DateProvider } from "../date-provider";
+import type { MessageRepository } from "../message.repository";
 
 export class ViewTimelineUseCase {
   constructor(
@@ -10,29 +8,11 @@ export class ViewTimelineUseCase {
     private readonly dateProvider: DateProvider
   ) {}
 
-  async handle({ user }: { user: string }): Promise<Timeline> {
+  async handle({ user }: { user: string }): Promise<TimelineItem[]> {
     const userMessages = await this.messageRepository.getAllOfUser(user);
-    userMessages.sort(
-      (msgA, msgB) => msgB.publishedAt.getTime() - msgA.publishedAt.getTime()
-    );
+    userMessages;
     const now = this.dateProvider.getNow();
-    return userMessages.map((m) => ({
-      author: m.author,
-      text: m.text,
-      publicationTime: this.publicationTime(now, m.publishedAt),
-    }));
+    const timeline = new Timeline(userMessages, now);
+    return timeline.data;
   }
-
-  private publicationTime = (now: Date, publishedAt: Date): string => {
-    const diff = now.getTime() - publishedAt.getTime();
-    const minuteNumber = Math.floor(diff / ONE_MINUTE_IN_MS);
-    if (minuteNumber < 1) {
-      return "Less than a minute ago";
-    }
-    if (minuteNumber < 2) {
-      return "1 minute ago";
-    }
-
-    return `${minuteNumber} minutes ago`;
-  };
 }

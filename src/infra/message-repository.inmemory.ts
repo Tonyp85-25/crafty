@@ -1,5 +1,5 @@
-import { MessageRepository } from "../application/message.repository";
-import { Message } from "../domain/message";
+import type { MessageRepository } from "../application/message.repository";
+import type { Message } from "../domain/message";
 
 export class InMemoryMessageRepository implements MessageRepository {
   getById(messageId: string): Promise<Message> {

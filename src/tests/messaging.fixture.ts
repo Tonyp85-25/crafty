@@ -1,11 +1,11 @@
 import { EditMessageUseCase } from "../application/usecases/edit-message.usecase";
 import {
-  PostMessageCommand,
   PostMessageUseCase,
+  type PostMessageCommand,
 } from "../application/usecases/post-message.usecase";
 import { ViewTimelineUseCase } from "../application/usecases/view-timeline.usecase";
-import { Message } from "../domain/message";
-import { Timeline } from "../domain/timeline";
+import type { Message } from "../domain/message";
+import type { TimelineItem } from "../domain/timeline";
 import { InMemoryMessageRepository } from "../infra/message-repository.inmemory";
 import { StubDateProvider } from "../infra/stub-date-provider";
 
@@ -22,7 +22,7 @@ export const createMessagingFixture = () => {
     dateProvider
   );
   let thrownError: Error;
-  let timeline: Timeline;
+  let timeline: TimelineItem[];
 
   return {
     givenNowIs(_now: Date) {
@@ -58,7 +58,7 @@ export const createMessagingFixture = () => {
     async whenUserSeesTimelineOf(user: string) {
       timeline = await viewTimelineUseCase.handle({ user });
     },
-    thenUserShouldSee(_timeline: Timeline) {
+    thenUserShouldSee(_timeline: TimelineItem[]) {
       expect(timeline).toEqual(_timeline);
     },
   };
