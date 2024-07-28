@@ -2,16 +2,18 @@
 
 import { Command } from "commander";
 import { randomUUID } from "crypto";
-import { DateProvider } from "./src/application/date-provider";
+import type { DateProvider } from "./src/application/date-provider";
 import {
-  EditMessageCommand,
   EditMessageUseCase,
+  type EditMessageCommand,
 } from "./src/application/usecases/edit-message.usecase";
+import { FollowUserUseCase } from "./src/application/usecases/follow-user.usecase";
 import {
-  PostMessageCommand,
   PostMessageUseCase,
+  type PostMessageCommand,
 } from "./src/application/usecases/post-message.usecase";
 import { ViewTimelineUseCase } from "./src/application/usecases/view-timeline.usecase";
+import { FileSystemFolloweeRepository } from "./src/infra/followee.fs.repository";
 import { FileSystemMessageRepository } from "./src/infra/message-repository.fs";
 
 class RealDateProvider implements DateProvider {
@@ -21,6 +23,7 @@ class RealDateProvider implements DateProvider {
 }
 
 const messageRepository = new FileSystemMessageRepository();
+const followeeRepository = new FileSystemFolloweeRepository();
 const dateProvider = new RealDateProvider();
 const postMessageUseCase = new PostMessageUseCase(
   messageRepository,
@@ -31,6 +34,8 @@ const viewTimelineUseCase = new ViewTimelineUseCase(
   dateProvider
 );
 const editMessageUseCase = new EditMessageUseCase(messageRepository);
+
+const followUserUseCase = new FollowUserUseCase(followeeRepository);
 const program = new Command();
 
 program
@@ -82,10 +87,24 @@ program
         try {
           await editMessageUseCase.handle(editMessageCommand);
           console.log("✔️  message modifié!");
+          process.exit(0);
           // console.table([messageRepository.message]);
         } catch (error) {
           console.error("⚠️ ", error);
+          process.exit(1);
         }
+      })
+  )
+  .addCommand(
+    new Command("follow")
+      .argument("<user>", "the current user")
+      .argument("<user-to-follow>", "the user to follow")
+      .action(async (user, userToFollow) => {
+        try {
+          await followUserUseCase.handle({ user, userToFollow });
+          console.log(`✔️  You follow ${userToFollow}!`);
+          process.exit(0);
+        } catch (error) {}
       })
   );
 

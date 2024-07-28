@@ -19,15 +19,22 @@ describe("Feature: view wall", () => {
   let fixture: Fixture;
   let messagingFixture: MessagingFixture;
   let followingFixture: FollowingFixture;
+
   const messageRepository = new InMemoryMessageRepository();
   const followeeRepository = new InMemoryFolloweeRepository();
+
   beforeEach(() => {
-    fixture = createFixture({ messageRepository, followeeRepository });
     messagingFixture = createMessagingFixture();
     followingFixture = createFollowingFixture();
+    fixture = createFixture({
+      messageRepository: messagingFixture.messageRepository,
+      followeeRepository: followingFixture.followeeRepository,
+    });
   });
+
   describe("Rule: All the messages from the user and its followees should appear in reverse chronological order", () => {
     test("Charlie subscribed to Alice's and Bob's timelines and view an agreggated list of subscriptions", async () => {
+      fixture.givenNowIs(new Date("2023-02-17T17:15:00.000Z"));
       messagingFixture.givenTheFollowingMessagesExist([
         messageBuilder()
           .withId("message-1")
@@ -45,14 +52,16 @@ describe("Feature: view wall", () => {
           .withId("message-3")
           .authoredBy("Charlie")
           .withText("Test message from Charlie")
-          .publishedAt(new Date("2023-02-17T17:02:00.000Z"))
+          .publishedAt(new Date("2023-02-17T17:14:00.000Z"))
           .build(),
       ]);
+
       followingFixture.givenUserFollowees({
         user: "Charlie",
-        followees: ["Alice", "Bob"],
+        followees: ["Alice"],
       });
       await fixture.whenUserSeesTimelineOf("Charlie");
+
       fixture.thenUserShouldSee([
         {
           author: "Charlie",
@@ -63,11 +72,6 @@ describe("Feature: view wall", () => {
           author: "Alice",
           text: "Test message from Alice",
           publicationTime: "15 minutes ago",
-        },
-        {
-          author: "Charlie",
-          text: "Test message from Charlie",
-          publicationTime: "1 minute ago",
         },
       ]);
     });

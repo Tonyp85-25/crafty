@@ -61,6 +61,7 @@ export const createMessagingFixture = () => {
     thenUserShouldSee(_timeline: TimelineItem[]) {
       expect(timeline).toEqual(_timeline);
     },
+    messageRepository,
   };
 };
 // Domain Specific language

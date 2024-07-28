@@ -1,5 +1,5 @@
 import type { MessageRepository } from "../application/message.repository";
-import type { Message } from "../domain/message";
+import { Message } from "../domain/message";
 
 export class InMemoryMessageRepository implements MessageRepository {
   getById(messageId: string): Promise<Message> {
@@ -20,7 +20,16 @@ export class InMemoryMessageRepository implements MessageRepository {
   }
   getAllOfUser(user: string): Promise<Message[]> {
     return Promise.resolve(
-      [...this.messages.values()].filter((msg) => msg.author === user)
+      [...this.messages.values()]
+        .filter((msg) => msg.author === user)
+        .map((m) =>
+          Message.fromData({
+            id: m.id,
+            author: m.author,
+            text: m.text,
+            publishedAt: m.publishedAt,
+          })
+        )
     );
   }
 
