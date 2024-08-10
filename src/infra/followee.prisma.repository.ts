@@ -1,4 +1,5 @@
-import { PrismaClient } from "@prisma/client";
+import type { PrismaClient } from "@prisma/client";
+import type { Followee } from "../application/followee.repository";
 
 export class PrismaFoloweeRepository {
   constructor(private readonly prisma: PrismaClient) {}
