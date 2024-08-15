@@ -4,11 +4,13 @@
 	"description": "",
 	"main": "index.js",
 	"scripts": {
-		"build": "tsc -t es5 --noEmit --esModuleInterop=true --downlevelIteration ./index.ts && esbuild index.ts --bundle --platform=node --format=cjs --outfile=dist/index.js",
+		"build:cli": "tsc -t es5 --noEmit --esModuleInterop --downlevelIteration ./src/apps/cli.ts && esbuild src/apps/cli.ts --bundle --platform=node --format=cjs --outfile=dist/cli.js",
+		"build:api": "tsc -t es5 --noEmit --esModuleInterop --downlevelIteration ./src/apps/api.ts && esbuild src/apps/api.ts --bundle --platform=node --format=cjs --outfile=dist/api.js",
+		"start:api": "node ./dist/api.js",
 		"test": "jest --watch"
 	},
 	"bin": {
-		"crafty": "dist/index.js"
+		"crafty": "dist/cli.js"
 	},
 	"prisma": {
 		"schema": "src/infra/prisma/schema.prisma"
@@ -19,6 +21,7 @@
 	"devDependencies": {
 		"@biomejs/biome": "^1.7.3",
 		"@testcontainers/postgresql": "^10.11.0",
+		"@types/http-errors": "^2.0.4",
 		"@types/jest": "^29.5.3",
 		"@types/node": "^18.17.3",
 		"esbuild": "^0.17.8",
@@ -29,6 +32,8 @@
 	},
 	"dependencies": {
 		"@prisma/client": "5.17.0",
-		"commander": "^11.0.0"
+		"commander": "^11.0.0",
+		"fastify": "^4.28.1",
+		"http-errors": "^2.0.0"
 	}
 }
