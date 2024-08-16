@@ -4,6 +4,7 @@ import { PrismaClient } from "@prisma/client";
 import { Command } from "commander";
 import { randomUUID } from "node:crypto";
 import type { DateProvider } from "../application/date-provider";
+import { TimelinePresenter } from "../application/timeline.presenter";
 import {
   type EditMessageCommand,
   EditMessageUseCase,
@@ -14,8 +15,10 @@ import {
   PostMessageUseCase,
 } from "../application/usecases/post-message.usecase";
 import { ViewTimelineUseCase } from "../application/usecases/view-timeline.usecase";
+import { Timeline } from "../domain/timeline";
 import { PrismaFoloweeRepository } from "../infra/followee.prisma.repository";
 import { PrismaMessageRepository } from "../infra/message.prisma.repository";
+import { TimelineDefaultPresenter } from "./timeline.default.presenter";
 
 class RealDateProvider implements DateProvider {
   getNow(): Date {
@@ -37,6 +40,17 @@ const viewTimelineUseCase = new ViewTimelineUseCase(
 const editMessageUseCase = new EditMessageUseCase(messageRepository);
 
 const followUserUseCase = new FollowUserUseCase(followeeRepository);
+
+class CliPresenter implements TimelinePresenter {
+  constructor(private readonly defaultPresenter: TimelineDefaultPresenter) {}
+  show(timeline: Timeline): void {
+    console.table(this.defaultPresenter.show(timeline));
+  }
+}
+
+const timelinePresenter = new CliPresenter(
+  new TimelineDefaultPresenter(dateProvider)
+);
 const program = new Command();
 
 program
@@ -66,8 +80,8 @@ program
       .argument("<user>", "the user to view the timeline")
       .action(async (user) => {
         try {
-          const timeline = await viewTimelineUseCase.handle({ user });
-          console.table(timeline);
+          await viewTimelineUseCase.handle({ user }, timelinePresenter);
+
           process.exit(0);
         } catch (err) {
           console.error(err);

@@ -1,6 +1,7 @@
-import { Timeline, type TimelineItem } from "../../domain/timeline";
+import { Timeline } from "../../domain/timeline";
 import type { DateProvider } from "../date-provider";
 import type { MessageRepository } from "../message.repository";
+import type { TimelinePresenter } from "../timeline.presenter";
 
 export class ViewTimelineUseCase {
   constructor(
@@ -8,11 +9,14 @@ export class ViewTimelineUseCase {
     private readonly dateProvider: DateProvider
   ) {}
 
-  async handle({ user }: { user: string }): Promise<TimelineItem[]> {
+  async handle(
+    { user }: { user: string },
+    timelinePresenter: TimelinePresenter
+  ): Promise<void> {
     const userMessages = await this.messageRepository.getAllOfUser(user);
     userMessages;
-    const now = this.dateProvider.getNow();
-    const timeline = new Timeline(userMessages, now);
-    return timeline.data;
+
+    const timeline = new Timeline(userMessages);
+    timelinePresenter.show(timeline);
   }
 }

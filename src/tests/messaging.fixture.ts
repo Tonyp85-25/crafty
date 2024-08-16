@@ -1,11 +1,13 @@
+import type { TimelinePresenter } from "../application/timeline.presenter";
 import { EditMessageUseCase } from "../application/usecases/edit-message.usecase";
 import {
-  PostMessageUseCase,
   type PostMessageCommand,
+  PostMessageUseCase,
 } from "../application/usecases/post-message.usecase";
 import { ViewTimelineUseCase } from "../application/usecases/view-timeline.usecase";
+import { TimelineDefaultPresenter } from "../apps/timeline.default.presenter";
 import type { Message } from "../domain/message";
-import type { TimelineItem } from "../domain/timeline";
+import type { Timeline, TimelineItem } from "../domain/timeline";
 import { InMemoryMessageRepository } from "../infra/message-repository.inmemory";
 import { StubDateProvider } from "../infra/stub-date-provider";
 
@@ -24,6 +26,12 @@ export const createMessagingFixture = () => {
   let thrownError: Error;
   let timeline: TimelineItem[];
 
+  const defaultTimelinePresenter = new TimelineDefaultPresenter(dateProvider);
+  const timelinePresenter: TimelinePresenter = {
+    show(theTimeline: Timeline) {
+      timeline = defaultTimelinePresenter.show(theTimeline);
+    },
+  };
   return {
     givenNowIs(_now: Date) {
       dateProvider.now = _now;
@@ -56,7 +64,7 @@ export const createMessagingFixture = () => {
       expect(thrownError).toBeInstanceOf(expectedErrorClass);
     },
     async whenUserSeesTimelineOf(user: string) {
-      timeline = await viewTimelineUseCase.handle({ user });
+      await viewTimelineUseCase.handle({ user }, timelinePresenter);
     },
     thenUserShouldSee(_timeline: TimelineItem[]) {
       expect(timeline).toEqual(_timeline);

@@ -1,18 +1,20 @@
 import type { FolloweeRepository } from "../application/followee.repository";
 import type { MessageRepository } from "../application/message.repository";
+import { TimelinePresenter } from "../application/timeline.presenter";
 import { ViewWallUseCase } from "../application/usecases/view-wall.usecase";
-import type { TimelineItem } from "../domain/timeline";
+import { TimelineDefaultPresenter } from "../apps/timeline.default.presenter";
+import type { Timeline, TimelineItem } from "../domain/timeline";
 import { InMemoryFolloweeRepository } from "../infra/followee.inmemory.repository";
 import { InMemoryMessageRepository } from "../infra/message-repository.inmemory";
 import { StubDateProvider } from "../infra/stub-date-provider";
 import {
-  createFollowingFixture,
   type FollowingFixture,
+  createFollowingFixture,
 } from "./following.fixture";
 import { messageBuilder } from "./message.builder";
 import {
-  createMessagingFixture,
   type MessagingFixture,
+  createMessagingFixture,
 } from "./messaging.fixture";
 
 describe("Feature: view wall", () => {
@@ -92,12 +94,18 @@ const createFixture = ({
     followeeRepository,
     dateProvider
   );
+  const defaultTimelinePresenter = new TimelineDefaultPresenter(dateProvider);
+  const timelinePresenter: TimelinePresenter = {
+    show(theTimeline: Timeline) {
+      wall = defaultTimelinePresenter.show(theTimeline);
+    },
+  };
   return {
     givenNowIs(_now: Date) {
       dateProvider.now = _now;
     },
     async whenUserSeesTimelineOf(user: string) {
-      wall = await viewWallUseCase.handle({ user });
+      await viewWallUseCase.handle({ user }, timelinePresenter);
     },
     thenUserShouldSee(expectedWall: TimelineItem[]) {
       expect(wall).toEqual(expectedWall);

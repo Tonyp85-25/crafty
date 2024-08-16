@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 import { PrismaClient } from "@prisma/client";
-import Fastify, { type FastifyInstance } from "fastify";
+import Fastify, { type FastifyInstance, FastifyReply } from "fastify";
 import * as httpErrors from "http-errors";
 
 import { randomUUID } from "node:crypto";
 import type { DateProvider } from "../application/date-provider";
+import { TimelinePresenter } from "../application/timeline.presenter";
 import {
   type EditMessageCommand,
   EditMessageUseCase,
@@ -15,6 +16,7 @@ import {
   PostMessageUseCase,
 } from "../application/usecases/post-message.usecase";
 import { ViewTimelineUseCase } from "../application/usecases/view-timeline.usecase";
+import { Timeline } from "../domain/timeline";
 import { PrismaFoloweeRepository } from "../infra/followee.prisma.repository";
 import { PrismaMessageRepository } from "../infra/message.prisma.repository";
 
@@ -42,6 +44,14 @@ const followUserUseCase = new FollowUserUseCase(followeeRepository);
 const fastify = Fastify({
   logger: true,
 });
+
+class ApiTimelinePresenter implements TimelinePresenter {
+  constructor(private readonly reply: FastifyReply) {}
+  show(timeline: Timeline): void {
+    this.reply.status(200);
+    this.reply.send(timeline.data);
+  }
+}
 
 const routes = async (fastifyInstance: FastifyInstance) => {
   fastifyInstance.post<{ Body: { user: string; message: string } }>(
@@ -88,11 +98,13 @@ const routes = async (fastifyInstance: FastifyInstance) => {
       | httpErrors.HttpError<500>;
   }>("/view", {}, async (request, reply) => {
     try {
-      const timeline = await viewTimelineUseCase.handle({
-        user: request.query.user,
-      });
-
-      reply.send(timeline);
+      const timelinePresenter = new ApiTimelinePresenter(reply);
+      await viewTimelineUseCase.handle(
+        {
+          user: request.query.user,
+        },
+        timelinePresenter
+      );
     } catch (err) {
       reply.send(httpErrors[500](err));
     }

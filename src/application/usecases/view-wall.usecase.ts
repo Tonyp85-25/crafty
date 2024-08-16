@@ -1,7 +1,8 @@
-import { Timeline, type TimelineItem } from "../../domain/timeline";
+import { Timeline } from "../../domain/timeline";
 import type { DateProvider } from "../date-provider";
 import type { FolloweeRepository } from "../followee.repository";
 import type { MessageRepository } from "../message.repository";
+import { TimelinePresenter } from "../timeline.presenter";
 export class ViewWallUseCase {
   constructor(
     private messageRepository: MessageRepository,
@@ -9,7 +10,10 @@ export class ViewWallUseCase {
     private dateProvider: DateProvider
   ) {}
 
-  async handle({ user }: { user: string }): Promise<TimelineItem[]> {
+  async handle(
+    { user }: { user: string },
+    timelinePresenter: TimelinePresenter
+  ): Promise<void> {
     const followees = await this.followeeRepository.getFolloweesOf(user);
     console.log(followees);
 
@@ -20,11 +24,8 @@ export class ViewWallUseCase {
         )
       )
     ).flat();
-    console.log(followeesMessages);
-    const timeline = new Timeline(
-      followeesMessages,
-      this.dateProvider.getNow()
-    );
-    return timeline.data;
+
+    const timeline = new Timeline(followeesMessages);
+    timelinePresenter.show(timeline);
   }
 }
