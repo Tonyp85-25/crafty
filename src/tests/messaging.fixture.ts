@@ -40,20 +40,16 @@ export const createMessagingFixture = () => {
       messageRepository.givenExistingMessages(messages);
     },
     async whenUserPostsAMessage(postMessageCommand: PostMessageCommand) {
-      try {
-        await postMessageUseCase.handle(postMessageCommand);
-      } catch (err: any) {
-        thrownError = err;
-      }
+      const result = await postMessageUseCase.handle(postMessageCommand);
+      if (result.isErr()) thrownError = result.error;
     },
     async whenUserEditsMessage(editMessageCommand: {
       messageId: string;
       text: string;
     }) {
-      try {
-        await editMessageUseCase.handle(editMessageCommand);
-      } catch (err: any) {
-        thrownError = err;
+      const result = await editMessageUseCase.handle(editMessageCommand);
+      if (result.isErr()) {
+        thrownError = result.error;
       }
     },
     async thenMessageShouldBe(expectedMessage: Message) {

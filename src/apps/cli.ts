@@ -68,10 +68,14 @@ program
         };
 
         try {
-          await postMessageUseCase.handle(postMessageCommand);
-          console.log("✔️  message posté!");
+          const result = await postMessageUseCase.handle(postMessageCommand);
+          if (result.isOk()) {
+            console.log("✔️  message posté!");
+            return;
+          }
+          console.error("⚠️ ", result.error);
         } catch (error) {
-          console.error("⚠️ ", error);
+          console.error("⚠️ Unexpected ", error);
         }
       })
   )
@@ -100,10 +104,13 @@ program
         };
 
         try {
-          await editMessageUseCase.handle(editMessageCommand);
-          console.log("✔️  message modifié!");
-          process.exit(0);
-          // console.table([messageRepository.message]);
+          const result = await editMessageUseCase.handle(editMessageCommand);
+          if (result.isOk()) {
+            console.log("✔️  message modifié!");
+            process.exit(0);
+          }
+          console.error("⚠️ ", result.error);
+          process.exit(1);
         } catch (error) {
           console.error("⚠️ ", error);
           process.exit(1);
